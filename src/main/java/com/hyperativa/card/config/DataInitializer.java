@@ -41,7 +41,8 @@ public class DataInitializer {
                     executeSqlScript(dataSource);
                     log.info("=== Database and tables created successfully ===");
                 } else {
-                    log.info("=== Database tables already exist ===");
+                    log.info("=== Database tables already exist. Cleaning data for fresh start ===");
+                    clearTablesData(dataSource);
                 }
             } else {
                 log.info("=== Test environment detected (H2). Skipping SQL script execution ===");
@@ -141,6 +142,44 @@ public class DataInitializer {
         } catch (Exception e) {
             log.error("Error executing SQL script: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to execute database initialization script", e);
+        }
+    }
+
+    /**
+     * Clears all data from cards and users tables
+     * Resets auto_increment IDs to 1
+     * Useful for testing and development environments
+     */
+    private void clearTablesData(DataSource dataSource) {
+        try (Connection connection = dataSource.getConnection()) {
+            connection.setAutoCommit(false);
+
+            try (var statement = connection.createStatement()) {
+                // Delete cards first (no foreign keys to worry about)
+                int cardsDeleted = statement.executeUpdate("DELETE FROM cards");
+                log.info("✓ Deleted {} records from 'cards' table", cardsDeleted);
+
+                // Reset auto_increment for cards table
+                statement.executeUpdate("ALTER TABLE cards AUTO_INCREMENT = 1");
+                log.info("✓ Reset auto_increment for 'cards' table to 1");
+
+                // Delete users
+                int usersDeleted = statement.executeUpdate("DELETE FROM users");
+                log.info("✓ Deleted {} records from 'users' table", usersDeleted);
+
+                // Reset auto_increment for users table
+                statement.executeUpdate("ALTER TABLE users AUTO_INCREMENT = 1");
+                log.info("✓ Reset auto_increment for 'users' table to 1");
+
+                connection.commit();
+                log.info("=== Tables cleaned and IDs reset successfully ===");
+            } catch (Exception e) {
+                connection.rollback();
+                throw e;
+            }
+        } catch (Exception e) {
+            log.error("Error clearing tables data: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to clear tables data", e);
         }
     }
 }

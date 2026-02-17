@@ -16,10 +16,10 @@ public class JwtTokenProvider {
 
     private static final Logger log = LoggerFactory.getLogger(JwtTokenProvider.class);
 
-    @Value("${app.jwt.secret:hyperativaSecretKeyForJWTTokenGenerationMustBeAtLeast256BitsLong}")
+    @Value("${app.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${app.jwt.expiration:86400000}") // 24 hours in ms
+    @Value("${app.jwt.expiration}")
     private long jwtExpiration;
 
     private SecretKey getSigningKey() {

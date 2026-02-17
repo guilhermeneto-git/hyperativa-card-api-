@@ -1,3 +1,5 @@
+Repo base para construção da aplicação:
 https://github.com/hyperativa/back-end
 
+Repo público da aplicação implementada para o teste:
 https://github.com/guilhermeneto-git/hyperativa-card-api-
