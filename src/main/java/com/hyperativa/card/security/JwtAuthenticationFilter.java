@@ -45,10 +45,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.debug("Usuário autenticado: {} com role: {}", username, role);
+                log.debug("User authenticated: {} with role: {}", username, role);
             }
         } catch (Exception ex) {
-            log.error("Não foi possível autenticar o usuário", ex);
+            log.error("Could not authenticate user", ex);
         }
 
         filterChain.doFilter(request, response);

@@ -19,7 +19,7 @@ public class JwtTokenProvider {
     @Value("${app.jwt.secret:hyperativaSecretKeyForJWTTokenGenerationMustBeAtLeast256BitsLong}")
     private String jwtSecret;
 
-    @Value("${app.jwt.expiration:86400000}") // 24 horas em ms
+    @Value("${app.jwt.expiration:86400000}") // 24 hours in ms
     private long jwtExpiration;
 
     private SecretKey getSigningKey() {
@@ -67,15 +67,15 @@ public class JwtTokenProvider {
                     .parseSignedClaims(token);
             return true;
         } catch (SecurityException ex) {
-            log.error("Assinatura JWT inválida");
+            log.error("Invalid JWT signature");
         } catch (MalformedJwtException ex) {
-            log.error("Token JWT inválido");
+            log.error("Invalid JWT token");
         } catch (ExpiredJwtException ex) {
-            log.error("Token JWT expirado");
+            log.error("Expired JWT token");
         } catch (UnsupportedJwtException ex) {
-            log.error("Token JWT não suportado");
+            log.error("Unsupported JWT token");
         } catch (IllegalArgumentException ex) {
-            log.error("JWT claims string está vazio");
+            log.error("JWT claims string is empty");
         }
         return false;
     }

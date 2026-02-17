@@ -20,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/cards")
-@Tag(name = "Cards", description = "API para gerenciamento de cartões")
+@Tag(name = "Cards", description = "Card management API")
 public class CardController {
 
     private final CardService service;
@@ -33,17 +33,17 @@ public class CardController {
 
     @PostMapping
     @Operation(
-            summary = "Criar novo cartão",
-            description = "Insere um novo cartão no sistema. Retorna o ID do cartão criado."
+            summary = "Create new card",
+            description = "Inserts a new card in the system. Returns the ID of the created card."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cartão criado com sucesso",
+            @ApiResponse(responseCode = "200", description = "Card created successfully",
                     content = @Content(schema = @Schema(implementation = CardDto.class))),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Invalid data", content = @Content)
     })
     public ResponseEntity<CardDto> create(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Dados do cartão a ser criado",
+                    description = "Card data to be created",
                     required = true,
                     content = @Content(schema = @Schema(implementation = CardDto.class))
             )
@@ -54,25 +54,25 @@ public class CardController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
-            summary = "Upload de arquivo TXT com múltiplos cartões",
-            description = "Processa arquivo contendo múltiplos números de cartão. " +
-                         "O processamento é feito em lotes (batch) para otimizar performance com grandes volumes de dados. " +
-                         "Retorna estatísticas do processamento incluindo quantidade processada, duplicados e erros."
+            summary = "Upload TXT file with multiple cards",
+            description = "Processes file containing multiple card numbers. " +
+                         "Processing is done in batches to optimize performance with large data volumes. " +
+                         "Returns processing statistics including processed quantity, duplicates and errors."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Arquivo processado com sucesso",
+            @ApiResponse(responseCode = "200", description = "File processed successfully",
                     content = @Content(schema = @Schema(implementation = UploadResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "Arquivo inválido ou erro no processamento",
+            @ApiResponse(responseCode = "400", description = "Invalid file or processing error",
                     content = @Content)
     })
     public ResponseEntity<UploadResultDto> uploadFile(
-            @Parameter(description = "Arquivo TXT", required = true)
+            @Parameter(description = "TXT file", required = true)
             @RequestParam("file") MultipartFile file) {
 
         if (file.isEmpty()) {
             UploadResultDto error = new UploadResultDto();
             error.setStatus("ERROR");
-            error.getErrors().add("Arquivo vazio");
+            error.getErrors().add("Empty file");
             return ResponseEntity.badRequest().body(error);
         }
 
@@ -82,15 +82,15 @@ public class CardController {
 
     @GetMapping("/exists")
     @Operation(
-            summary = "Verificar existência de cartão",
-            description = "Consulta se um cartão existe no sistema pelo número completo. Retorna o ID se encontrado."
+            summary = "Check card existence",
+            description = "Checks if a card exists in the system by its complete number. Returns the ID if found."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cartão encontrado"),
-            @ApiResponse(responseCode = "404", description = "Cartão não encontrado", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Card found"),
+            @ApiResponse(responseCode = "404", description = "Card not found", content = @Content)
     })
     public ResponseEntity<?> exists(
-            @Parameter(description = "Número completo do cartão", required = true, example = "4456897999999999")
+            @Parameter(description = "Complete card number", required = true, example = "4456897999999999")
             @RequestParam("cardNumber") Long cardNumber) {
         Long id = service.findIdByCardNumber(cardNumber);
         return ResponseEntity.ok(Map.of("id", id));

@@ -13,31 +13,31 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Resultado do processamento do upload de arquivo")
+@Schema(description = "File upload processing result")
 public class UploadResultDto {
 
-    @Schema(description = "Nome do lote processado", example = "LOTE0001000010")
+    @Schema(description = "Processed batch name", example = "LOTE0001000010")
     private String loteName;
 
-    @Schema(description = "Data do lote (YYYYMMDD)", example = "20180524")
+    @Schema(description = "Batch date (YYYYMMDD)", example = "20180524")
     private String loteDate;
 
-    @Schema(description = "Quantidade de registros declarada no arquivo", example = "10")
+    @Schema(description = "Number of records declared in the file", example = "10")
     private Integer declaredCount;
 
-    @Schema(description = "Quantidade de registros processados com sucesso", example = "8")
+    @Schema(description = "Number of successfully processed records", example = "8")
     private Integer processedCount;
 
-    @Schema(description = "Quantidade de registros duplicados (já existentes)", example = "2")
+    @Schema(description = "Number of duplicate records (already existing)", example = "2")
     private Integer duplicatedCount;
 
-    @Schema(description = "Quantidade de registros com erro", example = "0")
+    @Schema(description = "Number of records with errors", example = "0")
     private Integer errorCount;
 
-    @Schema(description = "Lista de erros encontrados durante o processamento")
+    @Schema(description = "List of errors found during processing")
     private List<String> errors = new ArrayList<>();
 
-    @Schema(description = "Status do processamento", example = "SUCCESS")
+    @Schema(description = "Processing status", example = "SUCCESS")
     private String status;
 }
 

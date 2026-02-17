@@ -30,7 +30,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         body.put("timestamp", Instant.now().toString());
         body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
         body.put("error", "Unauthorized");
-        body.put("message", "Token JWT ausente, inválido ou expirado. Faça login em /api/auth/login");
+        body.put("message", "JWT token missing, invalid or expired. Login at /api/auth/login");
         body.put("path", request.getRequestURI());
 
         response.getWriter().write(objectMapper.writeValueAsString(body));

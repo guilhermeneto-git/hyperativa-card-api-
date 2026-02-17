@@ -1,9 +1,10 @@
-package com.hyperativa.card.service;
+package com.hyperativa.card.service.impl;
 
 import com.hyperativa.card.dto.CardDto;
 import com.hyperativa.card.exception.CardNotFoundException;
 import com.hyperativa.card.model.Card;
 import com.hyperativa.card.repository.CardRepository;
+import com.hyperativa.card.service.CardService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

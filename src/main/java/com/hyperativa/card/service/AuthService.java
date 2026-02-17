@@ -25,21 +25,21 @@ public class AuthService {
 
 
     public AuthResponse login(LoginRequest request) {
-        // Busca usuário
+        // Find user
         User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuário ou senha inválidos"));
+                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
 
-        // Valida senha
+        // Validate password
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Usuário ou senha inválidos");
+            throw new RuntimeException("Invalid username or password");
         }
 
-        // Valida se usuário está ativo
+        // Validate if user is active
         if (!user.getEnabled()) {
-            throw new RuntimeException("Usuário desativado");
+            throw new RuntimeException("User disabled");
         }
 
-        // Gera token
+        // Generate token
         String token = tokenProvider.generateToken(user.getUsername(), user.getRole());
 
         return new AuthResponse(token, user.getUsername(), user.getRole());

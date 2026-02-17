@@ -10,13 +10,13 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Objeto de transferência de dados do cartão")
+@Schema(description = "Card data transfer object")
 public class CardDto {
 
-    @Schema(description = "ID único do cartão no sistema", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "Unique card ID in the system", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
-    @Schema(description = "Número completo do cartão", example = "4456897999999999", required = true)
+    @Schema(description = "Complete card number", example = "4456897999999999", required = true)
     private Long cardNumber;
 }
 

@@ -1,8 +1,9 @@
-package com.hyperativa.card.service;
+package com.hyperativa.card.service.impl;
 
 import com.hyperativa.card.dto.UploadResultDto;
 import com.hyperativa.card.model.Card;
 import com.hyperativa.card.repository.CardRepository;
+import com.hyperativa.card.service.FileUploadService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,7 +21,7 @@ import java.util.List;
 public class FileUploadServiceImpl implements FileUploadService {
 
     private static final Logger log = LoggerFactory.getLogger(FileUploadServiceImpl.class);
-    private static final int BATCH_SIZE = 1000; // Processa 1000 registros por vez
+    private static final int BATCH_SIZE = 1000; // Process 1000 records at a time
 
     private final CardRepository cardRepository;
 
@@ -46,23 +47,23 @@ public class FileUploadServiceImpl implements FileUploadService {
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
 
-                // Linha 1: Header
+                // Line 1: Header
                 if (lineNumber == 1) {
                     parseHeader(line, result);
                     continue;
                 }
 
-                // Linhas de detalhe (começam com C)
+                // Detail lines (start with C)
                 if (line.trim().startsWith("C")) {
                     try {
                         Long cardNumber = parseCardNumber(line);
                         if (cardNumber != null) {
                             Card card = new Card(cardNumber);
                             batch.add(card);
-                            log.info("Linha {}: Adicionado cartão {} ao batch (tamanho atual: {})",
+                            log.info("Line {}: Added card {} to batch (current size: {})",
                                     lineNumber, cardNumber, batch.size());
 
-                            // Processa batch quando atingir o tamanho limite
+                            // Process batch when reaching size limit
                             if (batch.size() >= BATCH_SIZE) {
                                 int[] batchResult = saveBatch(batch);
                                 processedCount += batchResult[0];
@@ -70,51 +71,51 @@ public class FileUploadServiceImpl implements FileUploadService {
                                 batch.clear();
                             }
                         } else {
-                            log.warn("Linha {}: Número de cartão nulo, não adicionado ao batch", lineNumber);
+                            log.warn("Line {}: Card number is null, not added to batch", lineNumber);
                         }
                     } catch (Exception e) {
                         errorCount++;
-                        String errorMsg = String.format("Erro na linha %d: %s", lineNumber, e.getMessage());
+                        String errorMsg = String.format("Error on line %d: %s", lineNumber, e.getMessage());
                         result.getErrors().add(errorMsg);
                         log.warn(errorMsg);
                     }
                 }
 
-                // Última linha: Footer (valida quantidade)
+                // Last line: Footer (validate quantity)
                 if (line.trim().matches("^LOTE\\d+.*")) {
                     parseFooter(line, result);
                 }
             }
 
-            // Processa registros restantes no batch
+            // Process remaining records in batch
             if (!batch.isEmpty()) {
                 int[] batchResult = saveBatch(batch);
                 processedCount += batchResult[0];
                 duplicatedCount += batchResult[1];
             }
 
-            // Define resultado final
+            // Set final result
             result.setProcessedCount(processedCount);
             result.setDuplicatedCount(duplicatedCount);
             result.setErrorCount(errorCount);
             result.setStatus(errorCount > 0 ? "COMPLETED_WITH_ERRORS" : "SUCCESS");
 
-            // Valida quantidade
+            // Validate quantity
             if (result.getDeclaredCount() != null &&
                 processedCount + duplicatedCount != result.getDeclaredCount()) {
                 result.getErrors().add(
-                    String.format("Quantidade processada (%d) diferente da declarada (%d)",
+                    String.format("Processed quantity (%d) different from declared (%d)",
                         processedCount + duplicatedCount, result.getDeclaredCount())
                 );
             }
 
-            log.info("Processamento concluído: {} processados, {} duplicados, {} erros",
+            log.info("Processing completed: {} processed, {} duplicates, {} errors",
                     processedCount, duplicatedCount, errorCount);
 
         } catch (Exception e) {
             result.setStatus("ERROR");
-            result.getErrors().add("Erro ao processar arquivo: " + e.getMessage());
-            log.error("Erro ao processar arquivo", e);
+            result.getErrors().add("Error processing file: " + e.getMessage());
+            log.error("Error processing file", e);
         }
 
         return result;
@@ -122,10 +123,10 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     private void parseHeader(String line, UploadResultDto result) {
         try {
-            // Nome: posições 1-29 (0-based: 0-28)
-            // Data: posições 30-37 (0-based: 29-36)
-            // Lote: posições 38-45 (0-based: 37-44)
-            // Quantidade: posições 46-51 (0-based: 45-50)
+            // Name: positions 1-29 (0-based: 0-28)
+            // Date: positions 30-37 (0-based: 29-36)
+            // Batch: positions 38-45 (0-based: 37-44)
+            // Quantity: positions 46-51 (0-based: 45-50)
 
             if (line.length() >= 37) {
                 String date = line.substring(29, Math.min(37, line.length())).trim();
@@ -142,17 +143,17 @@ public class FileUploadServiceImpl implements FileUploadService {
                 try {
                     result.setDeclaredCount(Integer.parseInt(countStr));
                 } catch (NumberFormatException e) {
-                    log.warn("Não foi possível parsear quantidade declarada: {}", countStr);
+                    log.warn("Could not parse declared quantity: {}", countStr);
                 }
             }
         } catch (Exception e) {
-            log.warn("Erro ao parsear header: {}", e.getMessage());
+            log.warn("Error parsing header: {}", e.getMessage());
         }
     }
 
     private void parseFooter(String line, UploadResultDto result) {
-        // Footer contém lote e quantidade para validação
-        // Formato: LOTE0001000010 (8 char lote + 6 char quantidade)
+        // Footer contains batch and quantity for validation
+        // Format: LOTE0001000010 (8 char batch + 6 char quantity)
         try {
             if (line.length() >= 14) {
                 String lote = line.substring(0, 8).trim();
@@ -160,56 +161,56 @@ public class FileUploadServiceImpl implements FileUploadService {
 
                 if (!lote.equals(result.getLoteName())) {
                     result.getErrors().add(
-                        String.format("Lote no footer (%s) diferente do header (%s)",
+                        String.format("Batch in footer (%s) different from header (%s)",
                             lote, result.getLoteName())
                     );
                 }
             }
         } catch (Exception e) {
-            log.warn("Erro ao parsear footer: {}", e.getMessage());
+            log.warn("Error parsing footer: {}", e.getMessage());
         }
     }
 
     private Long parseCardNumber(String line) {
         try {
-            // Remove comentários (tudo após //)
+            // Remove comments (everything after //)
             String lineWithoutComments = line;
             int commentIndex = line.indexOf("//");
             if (commentIndex != -1) {
                 lineWithoutComments = line.substring(0, commentIndex);
             }
 
-            // Remove o identificador (C1, C2, etc.) e extrai apenas dígitos
+            // Remove identifier (C1, C2, etc.) and extract only digits
             String cardPart = lineWithoutComments.replaceFirst("^C\\d+\\s+", "").trim();
 
-            // Extrai apenas dígitos
+            // Extract only digits
             String digits = cardPart.replaceAll("[^0-9]", "");
 
             if (digits.isEmpty()) {
-                log.warn("Nenhum dígito encontrado na linha: {}", line);
+                log.warn("No digits found in line: {}", line);
                 return null;
             }
 
-            // Valida comprimento (cartões geralmente têm 13-19 dígitos)
+            // Validate length (cards typically have 13-19 digits)
             if (digits.length() < 13 || digits.length() > 19) {
-                log.warn("Número de cartão com comprimento inválido ({}): {}", digits.length(), digits);
+                log.warn("Card number with invalid length ({}): {}", digits.length(), digits);
             }
 
             Long cardNumber = Long.parseLong(digits);
-            log.info("  Parser extraiu: {} (comprimento: {})", cardNumber, digits.length());
+            log.info("  Parser extracted: {} (length: {})", cardNumber, digits.length());
             return cardNumber;
 
         } catch (NumberFormatException e) {
-            log.warn("Erro ao parsear número do cartão da linha: {}", line);
+            log.warn("Error parsing card number from line: {}", line);
             return null;
         }
     }
 
     /**
-     * Salva um batch de cartões no banco de dados.
-     * Usa transação independente (REQUIRES_NEW) para não afetar a transação principal.
-     * Detecta duplicados tanto no banco quanto dentro do próprio batch.
-     * Retorna [processados com sucesso, duplicados]
+     * Saves a batch of cards to the database.
+     * Uses independent transaction (REQUIRES_NEW) to not affect the main transaction.
+     * Detects duplicates both in the database and within the batch itself.
+     * Returns [successfully processed, duplicates]
      */
     @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
     private int[] saveBatch(List<Card> batch) {
@@ -217,42 +218,42 @@ public class FileUploadServiceImpl implements FileUploadService {
         int duplicated = 0;
         java.util.Set<Long> seenInBatch = new java.util.HashSet<>();
 
-        log.info("=== Iniciando processamento de batch com {} cartões ===", batch.size());
+        log.info("=== Starting batch processing with {} cards ===", batch.size());
 
         for (Card card : batch) {
             try {
                 Long cardNumber = card.getCardNumber();
-                log.info("Processando cartão: {}", cardNumber);
+                log.info("Processing card: {}", cardNumber);
 
-                // Verifica se já foi visto neste batch
+                // Check if already seen in this batch
                 if (seenInBatch.contains(cardNumber)) {
                     duplicated++;
-                    log.info("  -> DUPLICADO dentro do batch (já foi visto)");
+                    log.info("  -> DUPLICATE within batch (already seen)");
                     continue;
                 }
 
-                // Verifica se já existe no banco de dados
+                // Check if already exists in database
                 if (cardRepository.findByCardNumber(cardNumber).isPresent()) {
                     duplicated++;
-                    log.info("  -> DUPLICADO no banco de dados");
+                    log.info("  -> DUPLICATE in database");
                 } else {
                     cardRepository.save(card);
                     seenInBatch.add(cardNumber);
                     processed++;
-                    log.info("  -> SALVO com sucesso");
+                    log.info("  -> SAVED successfully");
                 }
             } catch (DataIntegrityViolationException e) {
-                // Violação de unique constraint - cartão duplicado
-                // Pode ocorrer em cenários de concorrência
+                // Unique constraint violation - duplicate card
+                // May occur in concurrency scenarios
                 duplicated++;
-                log.info("  -> DUPLICADO (constraint violation)");
+                log.info("  -> DUPLICATE (constraint violation)");
             } catch (Exception e) {
-                log.error("Erro ao salvar cartão: {}", card.getCardNumber(), e);
-                throw e; // Propaga para ser contabilizado como erro
+                log.error("Error saving card: {}", card.getCardNumber(), e);
+                throw e; // Propagate to be counted as error
             }
         }
 
-        log.info("=== Batch finalizado: {} processados, {} duplicados ===", processed, duplicated);
+        log.info("=== Batch completed: {} processed, {} duplicates ===", processed, duplicated);
         return new int[]{processed, duplicated};
     }
 }

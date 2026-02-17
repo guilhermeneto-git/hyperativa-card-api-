@@ -31,7 +31,7 @@ public class ApiExceptionHandler {
                 "timestamp", Instant.now().toString(),
                 "status", HttpStatus.UNAUTHORIZED.value(),
                 "error", "Unauthorized",
-                "message", "Credenciais inválidas ou token JWT expirado/inválido"
+                "message", "Invalid credentials or expired/invalid JWT token"
         );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
@@ -42,7 +42,7 @@ public class ApiExceptionHandler {
                 "timestamp", Instant.now().toString(),
                 "status", HttpStatus.UNAUTHORIZED.value(),
                 "error", "Unauthorized",
-                "message", "Usuário ou senha inválidos"
+                "message", "Invalid username or password"
         );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
@@ -53,7 +53,7 @@ public class ApiExceptionHandler {
                 "timestamp", Instant.now().toString(),
                 "status", HttpStatus.FORBIDDEN.value(),
                 "error", "Forbidden",
-                "message", "Você não tem permissão para acessar este recurso"
+                "message", "You don't have permission to access this resource"
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
@@ -75,7 +75,7 @@ public class ApiExceptionHandler {
                 "timestamp", Instant.now().toString(),
                 "status", HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "error", "Internal Server Error",
-                "message", "Ocorreu um erro interno no servidor"
+                "message", "An internal server error occurred"
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }

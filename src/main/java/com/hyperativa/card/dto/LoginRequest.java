@@ -10,13 +10,13 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Request de login")
+@Schema(description = "Login request")
 public class LoginRequest {
 
-    @Schema(description = "Nome de usuário", example = "admin", required = true)
+    @Schema(description = "Username", example = "admin", required = true)
     private String username;
 
-    @Schema(description = "Senha", example = "admin123", required = true)
+    @Schema(description = "Password", example = "admin123", required = true)
     private String password;
 }
 

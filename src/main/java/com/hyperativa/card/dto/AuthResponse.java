@@ -10,19 +10,19 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Response de autenticação com JWT token")
+@Schema(description = "Authentication response with JWT token")
 public class AuthResponse {
 
-    @Schema(description = "JWT token de acesso", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+    @Schema(description = "JWT access token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     private String token;
 
-    @Schema(description = "Tipo do token", example = "Bearer")
+    @Schema(description = "Token type", example = "Bearer")
     private String type = "Bearer";
 
-    @Schema(description = "Nome de usuário", example = "admin")
+    @Schema(description = "Username", example = "admin")
     private String username;
 
-    @Schema(description = "Role do usuário", example = "ADMIN")
+    @Schema(description = "User role", example = "ADMIN")
     private String role;
 
     public AuthResponse(String token, String username, String role) {

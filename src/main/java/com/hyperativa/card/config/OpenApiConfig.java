@@ -26,21 +26,21 @@ public class OpenApiConfig {
                                                 .type(SecurityScheme.Type.HTTP)
                                                 .scheme("bearer")
                                                 .bearerFormat("JWT")
-                                                .description("Insira o JWT token. Exemplo: Bearer eyJhbGci...")
+                                                .description("Insert JWT token. Example: Bearer eyJhbGci...")
                                 )
                 )
                 .info(new Info()
                         .title("Card API - Hyperativa Challenge")
                         .version("1.0.0")
-                        .description("API REST para gerenciamento de cartões com autenticação JWT. " +
-                                "Permite inserir cartões individualmente, via arquivo em lote, e consultar sua existência por número." +
-                                "\n\n**Para autenticar:**\n" +
-                                "1. Use um dos usuários pré-cadastrados:\n" +
+                        .description("REST API for card management with JWT authentication. " +
+                                "Allows inserting cards individually, via batch file, and querying their existence by number." +
+                                "\n\n**To authenticate:**\n" +
+                                "1. Use one of the pre-registered users:\n" +
                                 "   - **admin** / **admin123** (Role: ADMIN)\n" +
                                 "   - **user** / **user123** (Role: USER)\n" +
-                                "2. Faça login em `/auth/login`\n" +
-                                "3. Copie o token retornado\n" +
-                                "4. Clique no botão 'Authorize' (🔒) e cole: `Bearer <token>`")
+                                "2. Login at `/auth/login`\n" +
+                                "3. Copy the returned token\n" +
+                                "4. Click the 'Authorize' button (🔒) and paste: `Bearer <token>`")
                         .contact(new Contact()
                                 .name("Hyperativa")
                                 .url("https://hyperativa.com")));
